@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="548.0" prefWidth="647.0" stylesheets="@dracula.css" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.AdminController">
+  <tabs>
+      <Tab fx:id="AllReservationsTab" onSelectionChanged="#HandleAllReservationsTabChanged" text="All Reservations">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TableView fx:id="reservationsTable" layoutX="4.0" layoutY="60.0" prefHeight="508.0" prefWidth="647.2" style="-fx-background-color: #150b26;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <columns>
+                      <TableColumn fx:id="reservationIDColumn" text="Reservation ID" />
+						<TableColumn fx:id="customerNameColumn" text="Customer Name" />
+						<TableColumn fx:id="tableCapacityColumn" text="Table Capacity" />
+						<TableColumn fx:id="reservationTimeColumn" text="Reservation Time" />
+						<TableColumn fx:id="confirmationSentColumn" text="Confirmation Sent" />
+                    </columns>
+                  </TableView>
+               </children>
+            </AnchorPane>
+        </content>
+      </Tab>
+    <Tab text="Manage Tables">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0">
+          <children>
+            <TabPane layoutX="-17.0" layoutY="86.0" prefHeight="371.2" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <tabs>
+                <Tab text="Add Table">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0">
+                      <children>
+                        <VBox layoutX="34.0" layoutY="39.0" style="al: 20;">
+                          <children>
+                            <HBox style="-fx-spacing: 30;" />
+                                          <AnchorPane AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+                          </children>
+                        </VBox>
+                    <HBox alignment="CENTER_LEFT" focusTraversable="true" layoutX="126.0" layoutY="110.0" style="-fx-spacing: 50;" stylesheets="@styles.css">
+                      <children>
+                        <VBox style="-fx-spacing: 50;">
+                          <children>
+                            <Label style="-fx-text-fill: #19939c;" text="Capacity" textFill="#19939c">
+                              <font>
+                                <Font name="Roboto" size="22.0" />
+                              </font>
+                            </Label>
+                          </children>
+                        </VBox>
+                        <VBox style="-fx-spacing: 50;">
+                          <children>
+                                               <Spinner fx:id="tableCapacitySpinner" editable="false" layoutX="50" layoutY="100" prefWidth="100" />
+
+                          </children>
+                        </VBox>
+                      </children>
+                    </HBox>
+                      <!-- Bottom Right Button -->
+                      <Button fx:id="tableCapacitySubmit" layoutX="326.0" layoutY="158.0" onAction="#handleAddTableAction" styleClass="primary-button" text="Submit" />
+                      </children>
+                    </AnchorPane>
+                  </content>
+                </Tab>
+                        <Tab fx:id="Delete_Table_Tab" onSelectionChanged="#HandleDeleteTableTabClick" text="Delete Table">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <ComboBox fx:id="tableDropdown" layoutX="208.0" layoutY="93.0" prefWidth="150.0" promptText="Tables" />
+                                    <Button fx:id="deleteButton" layoutX="326.0" layoutY="158.0" onAction="#handleDeleteButtonAction" styleClass="primary-button" text="Delete" />
+                                    <Label layoutX="103.0" layoutY="94.0" prefHeight="22.0" prefWidth="74.0" text="Select Table" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+                        <Tab onSelectionChanged="#HandleUpdateTableTabClick" text="Update Table">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <ComboBox fx:id="tableDropdown1" layoutX="225.0" layoutY="88.0" prefWidth="150.0" promptText="Tables" />
+                                    <Label layoutX="82.0" layoutY="89.0" prefHeight="22.0" prefWidth="74.0" text="Select Table" />
+                                    <Label layoutX="82.0" layoutY="160.0" prefHeight="22.0" prefWidth="74.0" text="Capacity" />
+                                    <Spinner fx:id="tableCapacitySpinner1" editable="false" layoutX="225.0" layoutY="158.0" prefHeight="26.0" prefWidth="156.0" />
+                                    <Button fx:id="UpdateButton" layoutX="324.0" layoutY="227.0" onAction="#handleUpdateButtonAction" styleClass="primary-button" text="Update" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+              </tabs>
+            </TabPane>
+          </children>
+        </AnchorPane>
+      </content>
+    </Tab>
+      <Tab fx:id="ReportsTab" onSelectionChanged="#HandleReportTabChanged" text="Reports">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TabPane prefHeight="508.0" prefWidth="647.2" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <tabs>
+                      <Tab text="Reservations">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="398.0">
+                                 <children>
+                                    <BarChart fx:id="reservationChart" layoutY="-5.0" prefHeight="468.0" prefWidth="647.2" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <xAxis>
+                                          <CategoryAxis fx:id="monthAxis" label="Month" />
+                                       </xAxis>
+                                       <yAxis>
+                                          <NumberAxis fx:id="countAxis" label="Reservations" />
+                                       </yAxis>
+                                    </BarChart>
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </Tab>
+                      <Tab fx:id="feedbackTab" text="Feedback">
+                        <content>
+                         <BorderPane>
+						    <top>
+						        <Label alignment="center" style="-fx-font-size: 18; -fx-font-weight: bold;" text="Feedback Report" />
+						    </top>
+						    <center>
+						        <HBox spacing="20">
+						            <!-- Pie Chart -->
+						            <PieChart fx:id="feedbackChart" prefHeight="400" prefWidth="400" />
+						
+						            <!-- Table for Comments -->
+						            <TableView fx:id="feedbackTable" prefHeight="441.0" prefWidth="558.0">
+						                <columns>
+						                    <TableColumn fx:id="RatingColumn" prefWidth="116.80005025863647" text="Rating" />
+						                    <TableColumn fx:id="commentColumn" prefWidth="308.0" text="Comment" />
+						                </columns>
+						            </TableView>
+						        </HBox>
+						    </center>
+						</BorderPane>
+                        </content>
+                      </Tab>
+                        <Tab text="Payments">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TableView fx:id="reportTable" prefHeight="468.0" prefWidth="647.2" style="-fx-background-color: #150b26;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+									    <columns>
+									        <TableColumn fx:id="tagColumn" prefWidth="237.5999755859375" text="Tag" />
+									        <TableColumn fx:id="valueColumn" prefWidth="353.5999755859375" text="Value" />
+									    </columns>
+									</TableView>
+
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+                    </tabs>
+                  </TabPane>
+               </children>
+            </AnchorPane>
+        </content>
+      </Tab>
+      <Tab onSelectionChanged="#HandleVerifyPaymenttabchange" text="Verify Payment">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <SplitPane dividerPositions="0.2515748031496063" orientation="VERTICAL" prefHeight="508.0" prefWidth="647.2" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="170.0" prefWidth="647.0">
+                           <children>
+                              <VBox prefHeight="253.6" prefWidth="647.2" style="-fx-alignment: top-center;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Label prefHeight="46.0" prefWidth="195.0" text="       Verify Cash Payments" textAlignment="CENTER">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <HBox style="-fx-spacing: 60; -fx-alignment: center;">
+                                       <children>
+                                          <Label prefHeight="35.0" prefWidth="156.0" text="Select Reservations" />
+                                          <ComboBox fx:id="ReservationDropdown" prefWidth="150.0" promptText="Reservations" />
+                                          <Button fx:id="GetDetailsButton" onAction="#handleGetDetailsButtonAction" styleClass="primary-button" text="Get Details" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <VBox fx:id="CashPaymentReservations" prefHeight="380.0" prefWidth="647.2" style="-fx-spacing: 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <VBox style="-fx-spacing: 20; -fx-padding: 10;">
+                                       <children>
+                                          <Label prefHeight="30.0" prefWidth="184.0" text="Reservation Details:-">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="lblRes" text="Reservation ID:" />
+                                          <Label fx:id="lblTable3" text="Table Number:" />
+                                       </children>
+                                    </VBox>
+                                    <VBox style="-fx-spacing: 20; -fx-padding: 10;">
+                                       <children>
+                                          <Label text="Customer Details:-">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="lblName3" text="Name:" />
+                                          <Label fx:id="lblPhone3" text="Phone:" />
+                                       </children>
+                                    </VBox>
+                                    <HBox prefHeight="114.0" prefWidth="620.0" style="-fx-padding: 10;">
+                                       <children>
+                                          <Label fx:id="lblAmount" text="TOTAL AMOUNT:">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="VerifyPaymentButton" onAction="#handleVerifyPaymentButtonAction" styleClass="primary-button" text="Verify Payment" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+        </content>
+      </Tab>
+  </tabs>
+</TabPane>

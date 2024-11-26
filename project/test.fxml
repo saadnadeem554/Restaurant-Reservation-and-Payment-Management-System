@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.gluonhq.charm.glisten.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+  <tabs>
+    <Tab text="Manage Tables">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0">
+          <children>
+            <TabPane layoutX="-17.0" layoutY="86.0" prefHeight="371.2" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <tabs>
+                <Tab text="Add Table">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0">
+                      <children>
+                        <VBox layoutX="34.0" layoutY="39.0" style="al: 20;">
+                          <children>
+                            <HBox style="-fx-spacing: 30;" />
+                                          <AnchorPane AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+                          </children>
+                        </VBox>
+                    <HBox alignment="CENTER_LEFT" focusTraversable="true" layoutX="126.0" layoutY="110.0" style="-fx-spacing: 50;" stylesheets="@styles.css">
+                      <children>
+                        <VBox style="-fx-spacing: 50;">
+                          <children>
+                            <Label style="-fx-text-fill: #19939c;" text="Capacity" textFill="#19939c">
+                              <font>
+                                <Font name="Roboto" size="22.0" />
+                              </font>
+                            </Label>
+                          </children>
+                        </VBox>
+                        <VBox style="-fx-spacing: 50;">
+                          <children>
+                                                <Spinner editable="true" />
+                          </children>
+                        </VBox>
+                      </children>
+                    </HBox>
+                      <!-- Bottom Right Button -->
+                      <Button layoutX="382.0" layoutY="152.0" styleClass="primary-button" text="Submit" />
+                      </children>
+                    </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Delete table">
+                <AnchorPane>
+				    <VBox style="-fx-spacing: 20;" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+				        <!-- Search Reservation -->
+				        <HBox style="-fx-spacing: 10;">
+				            <Label text="Phone: " />
+				            <TextField fx:id="txtReservationID" promptText="Enter Phone Number" />
+				            <Button onAction="#handleSearch" text="Search" />
+				        </HBox>
+				
+				        <!-- Display and Update Details -->
+				        <VBox fx:id="updateForm" style="-fx-spacing: 10;" visible="false">
+				            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Update Reservation Details:" />
+				            <HBox style="-fx-spacing: 20;">
+				                <VBox style="-fx-spacing: 10;">
+				                    <Label text="Name" />
+				                    <Label text="Email" />
+				                    <Label text="Phone" />
+				                    <Label text="Date" />
+				                    <Label text="Time" />
+				                    <Label text="Table" />
+				                </VBox>
+				                <VBox style="-fx-spacing: 10;">
+				                    <TextField fx:id="txtName" promptText="Name will appear here" />
+				                    <TextField fx:id="txtEmail" promptText="Email will appear here" />
+				                    <TextField fx:id="txtPhone" promptText="Phone will appear here" />
+				                    <DatePicker fx:id="dpDate" />
+				                    <TextField fx:id="txtTime" promptText="Time will appear here" />
+				                    <TextField fx:id="txtTable" promptText="Table will appear here" />
+				                </VBox>
+				            </HBox>
+				        </VBox>
+				
+				        <!-- Update Button -->
+				        <Button fx:id="btnUpdate" onAction="#handleUpdate" text="Update Reservation" visible="false" />
+				    </VBox>
+				</AnchorPane>                
+                </Tab>
+                <Tab text="Update Table">
+                 <AnchorPane>
+				    <VBox style="-fx-spacing: 20;" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+				        <!-- Search Reservation -->
+				        <HBox style="-fx-spacing: 10;">
+				            <Label text="Phone:" />
+				            <TextField fx:id="txtCancelReservationID" promptText="Enter Phone Number" />
+				            <Button onAction="#handleSearchCancel" text="Search" />
+				        </HBox>
+				
+				        <!-- Display Details -->
+				        <VBox fx:id="cancelForm" style="-fx-spacing: 10;" visible="false">
+				            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Reservation Details:" />
+				            <Label fx:id="lblName" text="Name: " />
+				            <Label fx:id="lblEmail" text="Email: " />
+				            <Label fx:id="lblPhone" text="Phone: " />
+				            <Label fx:id="lblDate" text="Date: " />
+				            <Label fx:id="lblTime" text="Time: " />
+				            <Label fx:id="lblTable" text="Table: " />
+				        </VBox>
+				
+				        <!-- Cancel Button -->
+				        <Button fx:id="btnCancel" onAction="#handleCancel" text="Cancel Reservation" visible="false" />
+				    </VBox>
+				</AnchorPane>
+
+                </Tab>
+              </tabs>
+            </TabPane>
+          </children>
+        </AnchorPane>
+      </content>
+    </Tab>
+    <Tab text="Checkout">
+      <content>
+        <AnchorPane />
+      </content>
+    </Tab>
+  </tabs>
+</TabPane>
