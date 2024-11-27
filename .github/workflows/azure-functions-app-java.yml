@@ -114,13 +114,16 @@ jobs:
             sudo rm -f /tmp/.X99-lock
             sudo pkill -f "java.*RestaurantSystemApp" || true
             sudo pkill Xvfb || true
-            
+
+            sudo Xvfb :99 -ac -screen 0 1280x1024x8 &
+            sleep 2
             # Ensure clean X11 environment
             export DISPLAY=:99
             export XDG_RUNTIME_DIR=/tmp
             
-             timeout 3s java -Dprism.order=sw -Djava.awt.headless=true -Djavafx.platform=desktop --module-path /home/azureuser/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml -cp /home/azureuser/MyRestaurantApp.jar:/home/azureuser/dependencies/libs/* project.RestaurantSystemApp > /home/azureuser/app_output.log 2>&1 || true
-            
+            timeout 30s java -Dprism.order=sw -Djava.awt.headless=true -Djavafx.platform=desktop --module-path /home/azureuser/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml -cp /home/azureuser/MyRestaurantApp.jar:/home/azureuser/dependencies/libs/* project.RestaurantSystemApp > /home/azureuser/app_output.log 2>&1 || true
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/app_output.log application_logs.log || true
+            cat application_logs.log
             # Cleanup after execution
             sudo pkill -f "java.*RestaurantSystemApp"
             sudo pkill Xvfb
