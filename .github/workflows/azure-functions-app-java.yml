@@ -58,7 +58,6 @@ jobs:
           cp ./UI/*.css resources/
           cp ./UI/*.png resources/
 
-
       - name: Build JavaFX app
         run: |
           export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
@@ -106,18 +105,32 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r resources $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
   
-
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
-            # Export DISPLAY environment variable
+            # Ensure a virtual framebuffer is running for headless GUI
+            Xvfb :99 -ac -screen 0 1280x1024x8 &
+            
+            # Export environment variables for headless operation
             export DISPLAY=:99
-          
-            # Force OpenGL to use software rendering
+            export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
             export LIBGL_ALWAYS_SOFTWARE=1
-            # Set the Java headless property to true to run the app without a GUI
-            export JAVA_OPTS="-Djava.awt.headless=true"
+            export XAUTHORITY=/dev/null
+            
             # Run JavaFX application in headless mode
             nohup java \
-              -Djava.library.path=/home/$AZURE_VM_USER/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64 \
+              -Djavafx.animation.framerate=60 \
+              -Dprism.order=j2d \
+              -Djavafx.platform=desktop \
+              -Djavafx.disable.multitransfer=true \
+              -Djavafx.concurrent.highlightOnStall=false \
+              -Djava.awt.headless=true \
+              -Dprism.verbose=true \
+              -Djavafx.isEmbedded=false \
+              -Djavafx.animation.framerate=60 \
+              -Djavafx.debug=false \
+              -Dcom.sun.javafx.isEmbedded=false \
+              -Djavafx.embed.singleThread=true \
+              -Djavafx.static=true \
+              -Djavafx.runtime=true \
               --module-path /home/$AZURE_VM_USER/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib \
               --add-modules javafx.controls,javafx.fxml \
               -cp /home/$AZURE_VM_USER/MyRestaurantApp.jar:/home/$AZURE_VM_USER/dependencies/libs/* \
