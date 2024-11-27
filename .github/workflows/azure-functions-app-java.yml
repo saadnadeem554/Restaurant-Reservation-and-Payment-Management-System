@@ -96,6 +96,9 @@ jobs:
           AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
           AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
         run: |
+          mkdir -p ~/.ssh
+          echo "${AZURE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
             # Update package lists
             sudo apt update
@@ -114,9 +117,6 @@ jobs:
           AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
           AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
         run: |
-          mkdir -p ~/.ssh
-          echo "${AZURE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
           # Upload JAR, dependencies, and resources
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
