@@ -129,7 +129,7 @@ jobs:
             sudo apt install -y x11-apps mesa-utils x11-utils
             sudo apt install -y scrot
             sudo apt install -y libgl1-mesa-glx libglx-mesa0
-            DISPLAY=:99 glxinfo | grep "OpenGL"
+            
 
             
             # Upgrade packages
@@ -172,12 +172,13 @@ jobs:
             chmod 777 /home/azureuser/screenshots
       
             # Start Xvfb
-            export DISPLAY=:99
-            export XDG_RUNTIME_DIR=/tmp
+            
             Xvfb :99 -ac -screen 0 1280x1024x8 &> /home/azureuser/xvfb.log &
             XVFB_PID=$!
             sleep 5  # Allow Xvfb to initialize
-      
+            DISPLAY=:99 glxinfo | grep "OpenGL"
+            export DISPLAY=:99
+            export XDG_RUNTIME_DIR=/tmp
             # Launch the JavaFX application
             (
               java -version  # Print Java version for diagnostics
