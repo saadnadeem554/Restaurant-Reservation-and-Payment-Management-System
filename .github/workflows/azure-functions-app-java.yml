@@ -39,14 +39,11 @@ jobs:
         run: |
           export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
           export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
-          javac --module-path "$JAVA_FX_PATH" --add-modules javafx.controls,javafx.fxml -cp ".:dependencies/sqljdbc/sqljdbc_12.8/enu/mssql-jdbc.jar" src/RestaurantSystemApp.java
-          jar cvfe MyRestaurantApp.jar RestaurantSystemApp -C src .
+          # Compile all Java files in the src directory
+          javac --module-path "$JAVA_FX_PATH" --add-modules javafx.controls,javafx.fxml -cp ".:dependencies/sqljdbc/sqljdbc_12.8/enu/mssql-jdbc.jar" $(find src -name "*.java")
+          # Package into a JAR with the correct main class
+          jar cvfe MyRestaurantApp.jar project.RestaurantSystemApp -C src .
 
-      - name: Debug - List files in src
-        run: |
-          echo "Files in src:"
-          ls -R src
-      
 
 
   deploy:
