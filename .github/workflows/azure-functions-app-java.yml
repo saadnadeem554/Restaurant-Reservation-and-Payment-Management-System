@@ -176,3 +176,10 @@ jobs:
           
           # Display logs
           cat application_logs.log
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v3
+        with:
+          name: application-screenshots
+          path: screenshots/
+          retention-days: 5
