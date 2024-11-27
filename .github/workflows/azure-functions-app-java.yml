@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Download JavaFX SDK and MSSQL driver
         run: |
@@ -34,13 +34,32 @@ jobs:
           fi
           unzip sqljdbc.zip -d dependencies/sqljdbc
 
+      - name: Download Additional Dependencies
+        run: |
+          mkdir -p dependencies/libs
+          # Download additional dependencies
+          curl -L -o dependencies/libs/commons-logging-1.3.4.jar https://repo1.maven.org/maven2/commons-logging/commons-logging/1.3.4/commons-logging-1.3.4.jar
+          curl -L -o dependencies/libs/httpclient-4.5.14.jar https://repo1.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.14/httpclient-4.5.14.jar
+          curl -L -o dependencies/libs/httpcore-4.4.16.jar https://repo1.maven.org/maven2/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar
+          curl -L -o dependencies/libs/jackson-annotations-2.18.1.jar https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.18.1/jackson-annotations-2.18.1.jar
+          curl -L -o dependencies/libs/jackson-core-2.18.1.jar https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.18.1/jackson-core-2.18.1.jar
+          curl -L -o dependencies/libs/jackson-databind-2.18.1.jar https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.18.1/jackson-databind-2.18.1.jar
+          curl -L -o dependencies/libs/jackson-datatype-jsr310-2.18.1.jar https://repo1.maven.org/maven2/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.18.1/jackson-datatype-jsr310-2.18.1.jar
+          curl -L -o dependencies/libs/jcl-over-slf4j-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/jcl-over-slf4j/2.1.0-alpha1/jcl-over-slf4j-2.1.0-alpha1.jar
+          curl -L -o dependencies/libs/joda-time-2.13.0.jar https://repo1.maven.org/maven2/joda-time/joda-time/2.13.0/joda-time-2.13.0.jar
+          curl -L -o dependencies/libs/slf4j-api-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-api/2.1.0-alpha1/slf4j-api-2.1.0-alpha1.jar
+          curl -L -o dependencies/libs/slf4j-reload4j-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-reload4j/2.1.0-alpha1/slf4j-reload4j-2.1.0-alpha1.jar
+          curl -L -o dependencies/libs/slf4j-simple-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.1.0-alpha1/slf4j-simple-2.1.0-alpha1.jar
+          curl -L -o dependencies/libs/twilio-10.6.3.jar https://repo1.maven.org/maven2/com/twilio/sdk/twilio/10.6.3/twilio-10.6.3.jar
+
+
 
       - name: Build JavaFX app
         run: |
           export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
           export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
           # Compile all Java files in the src directory
-          javac --module-path "$JAVA_FX_PATH" --add-modules javafx.controls,javafx.fxml -cp ".:dependencies/sqljdbc/sqljdbc_12.8/enu/mssql-jdbc.jar" $(find . -name "*.java")
+          javac --module-path "$JAVA_FX_PATH" --add-modules javafx.controls,javafx.fxml -cp ".:dependencies/sqljdbc/sqljdbc_12.8/enu/mssql-jdbc.jar:dependencies/libs/*" $(find . -name "*.java")
           # Package into a JAR with the correct main class
           jar cvfe MyRestaurantApp.jar project.RestaurantSystemApp -C src .
 
@@ -61,3 +80,4 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64 $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/sqljdbc_auth
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP "nohup java -Djava.library.path=/home/$AZURE_VM_USER/sqljdbc_auth --module-path /path/to/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml -jar /home/$AZURE_VM_USER/MyRestaurantApp.jar &"
+          java -Djava.library.path=/home/$AZURE_VM_USER/sqljdbc_auth --module-path /path/to/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml -cp ".:dependencies/libs/*" -jar /home/$AZURE_VM_USER/MyRestaurantApp.jar
