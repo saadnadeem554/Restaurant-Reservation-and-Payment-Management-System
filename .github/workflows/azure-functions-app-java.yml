@@ -113,15 +113,13 @@ jobs:
   
           # Start the JavaFX application on the Azure VM
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
-            sudo apt update
             sudo apt install -y openjdk-21-jdk xvfb
             nohup Xvfb :99 -screen 0 1920x1080x16 &
             export DISPLAY=:99
             nohup java \
-            -Djava.library.path=/home/$AZURE_VM_USER/sqljdbc_auth \
-            --module-path /home/$AZURE_VM_USER/javafx-sdk/javafx-sdk-23.0.1/lib \
+            -Djava.library.path=/home/$AZURE_VM_USER/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64 \
+            --module-path /home/$AZURE_VM_USER/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib \
             --add-modules javafx.controls,javafx.fxml \
             -cp /home/$AZURE_VM_USER/MyRestaurantApp.jar:/home/$AZURE_VM_USER/dependencies/libs/* \
             project.RestaurantSystemApp &
           EOF
-
