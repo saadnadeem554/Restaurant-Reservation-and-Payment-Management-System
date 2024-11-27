@@ -119,14 +119,7 @@ jobs:
             export DISPLAY=:99
             export XDG_RUNTIME_DIR=/tmp
             
-            timeout 3s java \
-              -Dprism.order=sw \
-              -Djava.awt.headless=true \
-              -Djavafx.platform=desktop \
-              --module-path /home/$AZURE_VM_USER/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib \
-              --add-modules javafx.controls,javafx.fxml \
-              -cp /home/$AZURE_VM_USER/MyRestaurantApp.jar:/home/$AZURE_VM_USER/dependencies/libs/* \
-              project.RestaurantSystemApp
+             timeout 3s java -Dprism.order=sw -Djava.awt.headless=true -Djavafx.platform=desktop --module-path /home/azureuser/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml -cp /home/azureuser/MyRestaurantApp.jar:/home/azureuser/dependencies/libs/* project.RestaurantSystemApp > /home/azureuser/app_output.log 2>&1 || true
             
             # Cleanup after execution
             sudo pkill -f "java.*RestaurantSystemApp"
