@@ -78,7 +78,10 @@ jobs:
             echo "JAR creation failed: MyRestaurantApp.jar not found."
             exit 1
           fi
-
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Ensure this job waits for 'build' job to finish
+    steps:
       - name: Copy files to Azure VM
         env:
           AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
