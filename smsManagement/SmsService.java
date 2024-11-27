@@ -6,8 +6,8 @@ import com.twilio.type.PhoneNumber;
 
 public class SmsService {
     // Replace these with your Twilio account details
-    private static final String ACCOUNT_SID = "AC90c6c4ac711f15cbd2ef211dd3c612bc";
-    private static final String AUTH_TOKEN = "4b3f6e579592acc6c72098f910aa2d7c";
+    private static final String ACCOUNT_SID = System.getenv("TWILIO_ACCOUNT_SID");
+    private static final String AUTH_TOKEN = System.getenv("TWILIO_AUTH_TOKEN");
 
     static {
         // Initialize Twilio SDK
