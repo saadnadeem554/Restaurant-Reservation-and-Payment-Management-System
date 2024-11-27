@@ -125,8 +125,7 @@ jobs:
             export XDG_RUNTIME_DIR=/tmp
             
             # Start Xvfb with a known configuration
-            sudo Xvfb :99 -ac -screen 0 1280x1024x8 -nolisten tcp -noreset &
-            echo -e "\n" > /dev/tty
+            sudo Xvfb :99 -ac -screen 0 1280x1024x8 -nolisten tcp -noreset 
           EOF
       - name: Deploy the programm
         env:
@@ -136,7 +135,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
             # Run application with timeout and logging
-            timeout 300s java \
+            timeout 3s java \
               -Dprism.order=sw \
               -Djava.awt.headless=true \
               -Djavafx.platform=desktop \
