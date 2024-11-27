@@ -5,8 +5,7 @@ module Proj {
 	requires javafx.fxml;
 	requires java.security.jgss;
 	requires jdk.security.auth;
-	requires com.microsoft.sqlserver.jdbc;
-	requires com.twilio.sdk;
+	requires static java.sql;
 
 
 	opens project to javafx.graphics, javafx.fxml, javafx.base;
