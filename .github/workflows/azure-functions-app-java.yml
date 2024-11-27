@@ -90,6 +90,14 @@ jobs:
         with:
           name: my-app-artifacts
   
+      - name: Prepare for Headless Execution
+        run: |
+          # Remove existing lock file if it exists
+          sudo rm -f /tmp/.X99-lock
+          
+          # Kill any existing Xvfb processes
+          sudo pkill Xvfb || true
+  
       - name: Copy files to Azure VM
         env:
           AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
@@ -106,31 +114,35 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r resources $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
   
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
-            # Ensure a virtual framebuffer is running for headless GUI
+            # Remove any existing lock files
+            sudo rm -f /tmp/.X99-lock
+            
+            # Kill any existing Xvfb processes
+            sudo pkill Xvfb || true
+            
+            # Start Xvfb with a clean slate
             Xvfb :99 -ac -screen 0 1280x1024x8 &
+            sleep 2  # Give Xvfb time to start
             
             # Export environment variables for headless operation
             export DISPLAY=:99
+            export PRISM_ORDER=sw
             export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
             export LIBGL_ALWAYS_SOFTWARE=1
             export XAUTHORITY=/dev/null
             
             # Run JavaFX application in headless mode
             nohup java \
-              -Djavafx.animation.framerate=60 \
-              -Dprism.order=j2d \
+              -Dprism.order=sw \
               -Djavafx.platform=desktop \
+              -Djavafx.animation.framerate=60 \
               -Djavafx.disable.multitransfer=true \
               -Djavafx.concurrent.highlightOnStall=false \
               -Djava.awt.headless=true \
               -Dprism.verbose=true \
               -Djavafx.isEmbedded=false \
-              -Djavafx.animation.framerate=60 \
-              -Djavafx.debug=false \
               -Dcom.sun.javafx.isEmbedded=false \
               -Djavafx.embed.singleThread=true \
-              -Djavafx.static=true \
-              -Djavafx.runtime=true \
               --module-path /home/$AZURE_VM_USER/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib \
               --add-modules javafx.controls,javafx.fxml \
               -cp /home/$AZURE_VM_USER/MyRestaurantApp.jar:/home/$AZURE_VM_USER/dependencies/libs/* \
