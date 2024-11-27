@@ -55,14 +55,29 @@ jobs:
           curl -L -o dependencies/libs/slf4j-simple-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.1.0-alpha1/slf4j-simple-2.1.0-alpha1.jar
           curl -L -o dependencies/libs/twilio-10.6.3.jar https://repo1.maven.org/maven2/com/twilio/sdk/twilio/10.6.3/twilio-10.6.3.jar
 
-      - name: Build JavaFX app
-        run: |
-          export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
-          export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
-          # Compile all Java files in the src directory
-          javac -cp "$JAVA_FX_PATH/*:dependencies/sqljdbc/sqljdbc_12.8/enu/jars/mssql-jdbc-12.8.1.jre11.jar:dependencies/libs/*" \
-          -d out $(find . -name "*.java")
-          jar --create --file MyRestaurantApp.jar --main-class project.RestaurantSystemApp -C out .
+           - name: Build JavaFX app
+            run: |
+              export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
+              export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
+              
+              # Compile Java files
+              javac -cp "$JAVA_FX_PATH/*:dependencies/sqljdbc/sqljdbc_12.8/enu/jars/mssql-jdbc-12.8.1.jre11.jar:dependencies/libs/*" \
+              -d out $(find . -name "*.java")
+    
+              # Verify compilation
+              if [ ! -d "out" ]; then
+                echo "Compilation failed: No output directory found."
+                exit 1
+              fi
+    
+              # Create the JAR file
+              jar --create --file MyRestaurantApp.jar --main-class project.RestaurantSystemApp -C out .
+    
+              # Verify JAR creation
+              if [ ! -f "MyRestaurantApp.jar" ]; then
+                echo "JAR creation failed: MyRestaurantApp.jar not found."
+                exit 1
+              fi
 
   deploy:
     runs-on: ubuntu-latest
@@ -76,6 +91,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "${AZURE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
+
+          # Copy the JAR and dependencies
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ./MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64 $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/sqljdbc_auth
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP "nohup java -Djava.library.path=/home/$AZURE_VM_USER/sqljdbc_auth -cp /path/to/javafx-sdk/lib/*:dependencies/libs/*:/home/$AZURE_VM_USER/MyRestaurantApp.jar project.RestaurantSystemApp &"
+
+          # Start the app on the VM
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP "nohup java -Djava.library.path=/home/$AZURE_VM_USER/sqljdbc_auth -cp /path/to/javafx-sdk/lib/*:/home/$AZURE_VM_USER/MyRestaurantApp.jar dependencies/libs/* project.RestaurantSystemApp &"
