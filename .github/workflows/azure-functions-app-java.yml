@@ -117,7 +117,7 @@ jobs:
             # Ensure clean X11 environment
             export DISPLAY=:99
             export XDG_RUNTIME_DIR=/tmp
-            
+            sudo Xvfb :99 -ac -screen 0 1280x1024x8
             timeout 30s java -Dprism.order=sw -Djava.awt.headless=true -Djavafx.platform=desktop --module-path /home/azureuser/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml -cp /home/azureuser/MyRestaurantApp.jar:/home/azureuser/dependencies/libs/* project.RestaurantSystemApp > /home/azureuser/app_output.log 2>&1 || true
             # Cleanup after execution
             sudo pkill -f "java.*RestaurantSystemApp"
