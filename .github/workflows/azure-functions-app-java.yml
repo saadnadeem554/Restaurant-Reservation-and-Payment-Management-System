@@ -95,8 +95,8 @@ jobs:
           # Ensure clean environment
           sudo rm -f /tmp/.X99-lock
           sudo pkill Xvfb || true
-  
-      - name: Copy files to Azure VM and Execute
+
+      - name: Copy files to Azure VM and run prereqs 
         env:
           AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
           AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
@@ -105,60 +105,44 @@ jobs:
           mkdir -p ~/.ssh
           echo "${AZURE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-      
           # Upload JAR, dependencies, and resources
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r resources $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
-
-      - name: run pre requisite commands
-        env:
-          AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
-          AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
-          AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-        run: |
+  
           # Execute remote commands with explicit process management
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
-            # Ensure clean environment
+            # Cleanup previous runs
             sudo rm -f /tmp/.X99-lock
+            sudo pkill -f "java.*RestaurantSystemApp" || true
             sudo pkill Xvfb || true
             
-            # Ensure directory exists and permissions are set
-            mkdir -p /home/$AZURE_VM_USER
-            touch /home/$AZURE_VM_USER/app_output.log
-            chmod 777 /home/$AZURE_VM_USER/app_output.log  # Set proper permissions
-      
-            # Start Xvfb with a known configuration
+            # Ensure clean X11 environment
             export DISPLAY=:99
             export XDG_RUNTIME_DIR=/tmp
+            
+            # Start Xvfb with a known configuration
             sudo Xvfb :99 -ac -screen 0 1280x1024x8 &
             sleep 2
           EOF
-      - name: Copy files to Azure VM and Execute
-        env:
-          AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
-          AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
-          AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-        run: |
-          # Run application with timeout and logging
+          - name: Deploy the programm
+          env:
+            AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
+            AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
+            AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+          run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
+            # Run application with timeout and logging
             timeout 300s java \
-            -Dprism.order=sw \
-            -Djava.awt.headless=true \
-            -Djavafx.platform=desktop \
-            --module-path /home/$AZURE_VM_USER/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib \
-            --add-modules javafx.controls,javafx.fxml \
-            -cp /home/$AZURE_VM_USER/MyRestaurantApp.jar:/home/$AZURE_VM_USER/dependencies/libs/* \
-            project.RestaurantSystemApp
-          EOF
-      - name: Clean up
-        env:
-          AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
-          AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
-          AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-        run: |
-          # Cleanup after execution
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
+              -Dprism.order=sw \
+              -Djava.awt.headless=true \
+              -Djavafx.platform=desktop \
+              --module-path /home/$AZURE_VM_USER/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib \
+              --add-modules javafx.controls,javafx.fxml \
+              -cp /home/$AZURE_VM_USER/MyRestaurantApp.jar:/home/$AZURE_VM_USER/dependencies/libs/* \
+              project.RestaurantSystemApp
+            
+            # Cleanup after execution
             sudo pkill -f "java.*RestaurantSystemApp"
             sudo pkill Xvfb
             sudo rm -f /tmp/.X99-lock
