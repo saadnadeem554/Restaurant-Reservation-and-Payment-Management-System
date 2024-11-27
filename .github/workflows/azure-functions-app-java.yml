@@ -206,8 +206,6 @@ jobs:
               # Capture screenshots
               for i in {1..3}; do
                 import -display :99 -window root /home/azureuser/screenshots/screenshot_import_$i.png || true
-                xwd -display :99 -root > /home/azureuser/screenshots/screenshot_xwd_$i.xwd || true
-                scrot -d 2 /home/azureuser/screenshots/screenshot_scrot_$i.png || true
               done
       
               # List captured screenshots
