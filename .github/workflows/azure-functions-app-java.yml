@@ -117,29 +117,42 @@ jobs:
           AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
           AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
         run: |
+          mkdir -p ~/.ssh
+          echo "${AZURE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
           # Upload JAR, dependencies, and resources
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r resources $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
-          # Execute remote commands with explicit process management
+      
+          # Execute remote commands with explicit X11 and display handling
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
-            # Cleanup previous runs
-            # Ensure clean environment
-            sudo rm -f /tmp/.X99-lock
-            sudo pkill Xvfb || true
-
-            sudo rm -f /tmp/.X99-lock
+            # Install Xvfb if not already installed
+            sudo apt-get update
+            sudo apt-get install -y xvfb
+      
+            # Cleanup previous runs to ensure clean environment
             sudo pkill -f "java.*RestaurantSystemApp" || true
             sudo pkill Xvfb || true
-            # Ensure clean X11 environment
+            sudo rm -f /tmp/.X99-lock
+      
+            # Set up virtual framebuffer
             export DISPLAY=:99
             export XDG_RUNTIME_DIR=/tmp
-            sudo Xvfb :99 -ac -screen 0 1280x1024x8
-            timeout 30s java -Dprism.order=sw -Djava.awt.headless=true -Djavafx.platform=desktop --module-path /home/azureuser/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml -cp /home/azureuser/MyRestaurantApp.jar:/home/azureuser/dependencies/libs/* project.RestaurantSystemApp > /home/azureuser/app_output.log 2>&1 || true
+      
+            # Start Xvfb in the background
+            Xvfb :99 -ac -screen 0 1280x1024x8 &
+            sleep 3  # Give Xvfb a moment to start
+      
+            # Run JavaFX application with explicit display and headless configurations
+            timeout 3s java -Dprism.order=sw -Djava.awt.headless=true -Djavafx.platform=desktop --module-path /home/azureuser/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml -cp /home/azureuser/MyRestaurantApp.jar:/home/azureuser/dependencies/libs/* project.RestaurantSystemApp > /home/azureuser/app_output.log 2>&1 || true
             # Cleanup after execution
             sudo pkill -f "java.*RestaurantSystemApp"
             sudo pkill Xvfb
             sudo rm -f /tmp/.X99-lock
           EOF
+      
+          # Retrieve and display logs
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/app_output.log application_logs.log || true
           cat application_logs.log
