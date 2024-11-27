@@ -42,6 +42,12 @@ jobs:
           javac --module-path "$JAVA_FX_PATH" --add-modules javafx.controls,javafx.fxml -cp ".:dependencies/sqljdbc/sqljdbc_12.8/enu/mssql-jdbc.jar" src/RestaurantSystemApp.java
           jar cvfe MyRestaurantApp.jar RestaurantSystemApp -C src .
 
+      - name: Debug - List files in src
+        run: |
+          echo "Files in src:"
+          ls -R src
+      
+
 
   deploy:
     runs-on: ubuntu-latest
