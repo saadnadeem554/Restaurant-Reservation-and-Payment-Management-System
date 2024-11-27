@@ -110,10 +110,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
             sudo apt update
             sudo apt install -y openjdk-21-jdk
-            # Download and extract JavaFX SDK (if needed)
-            mkdir -p ~/javafx-sdk
-            curl -L -o ~/javafx-sdk/javafx.zip https://download2.gluonhq.com/openjfx/23.0.1/openjfx-23.0.1_linux-x64_bin-sdk.zip
-            unzip ~/javafx-sdk/javafx.zip -d ~/javafx-sdk
           EOF
   
           # Copy artifacts to the VM
