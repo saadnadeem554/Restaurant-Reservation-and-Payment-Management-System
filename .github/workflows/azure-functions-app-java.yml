@@ -55,29 +55,29 @@ jobs:
           curl -L -o dependencies/libs/slf4j-simple-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.1.0-alpha1/slf4j-simple-2.1.0-alpha1.jar
           curl -L -o dependencies/libs/twilio-10.6.3.jar https://repo1.maven.org/maven2/com/twilio/sdk/twilio/10.6.3/twilio-10.6.3.jar
 
-           - name: Build JavaFX app
-            run: |
-              export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
-              export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
-              
-              # Compile Java files
-              javac -cp "$JAVA_FX_PATH/*:dependencies/sqljdbc/sqljdbc_12.8/enu/jars/mssql-jdbc-12.8.1.jre11.jar:dependencies/libs/*" \
-              -d out $(find . -name "*.java")
-    
-              # Verify compilation
-              if [ ! -d "out" ]; then
-                echo "Compilation failed: No output directory found."
-                exit 1
-              fi
-    
-              # Create the JAR file
-              jar --create --file MyRestaurantApp.jar --main-class project.RestaurantSystemApp -C out .
-    
-              # Verify JAR creation
-              if [ ! -f "MyRestaurantApp.jar" ]; then
-                echo "JAR creation failed: MyRestaurantApp.jar not found."
-                exit 1
-              fi
+      - name: Build JavaFX app
+        run: |
+          export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
+          export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
+          
+          # Compile Java files
+          javac -cp "$JAVA_FX_PATH/*:dependencies/sqljdbc/sqljdbc_12.8/enu/jars/mssql-jdbc-12.8.1.jre11.jar:dependencies/libs/*" \
+          -d out $(find . -name "*.java")
+
+          # Verify compilation
+          if [ ! -d "out" ]; then
+            echo "Compilation failed: No output directory found."
+            exit 1
+          fi
+
+          # Create the JAR file
+          jar --create --file MyRestaurantApp.jar --main-class project.RestaurantSystemApp -C out .
+
+          # Verify JAR creation
+          if [ ! -f "MyRestaurantApp.jar" ]; then
+            echo "JAR creation failed: MyRestaurantApp.jar not found."
+            exit 1
+          fi
 
   deploy:
     runs-on: ubuntu-latest
