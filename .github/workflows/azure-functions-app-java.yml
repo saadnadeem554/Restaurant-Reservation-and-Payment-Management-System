@@ -108,7 +108,13 @@ jobs:
   
 
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
-            
+            # Export DISPLAY environment variable
+            export DISPLAY=:99
+          
+            # Force OpenGL to use software rendering
+            export LIBGL_ALWAYS_SOFTWARE=1
+            # Set the Java headless property to true to run the app without a GUI
+            export JAVA_OPTS="-Djava.awt.headless=true"
             # Run JavaFX application in headless mode
             nohup java \
               -Djava.library.path=/home/$AZURE_VM_USER/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64 \
