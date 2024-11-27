@@ -119,10 +119,10 @@ jobs:
             export XDG_RUNTIME_DIR=/tmp
             
             timeout 30s java -Dprism.order=sw -Djava.awt.headless=true -Djavafx.platform=desktop --module-path /home/azureuser/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml -cp /home/azureuser/MyRestaurantApp.jar:/home/azureuser/dependencies/libs/* project.RestaurantSystemApp > /home/azureuser/app_output.log 2>&1 || true
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/app_output.log application_logs.log || true
-            cat application_logs.log
             # Cleanup after execution
             sudo pkill -f "java.*RestaurantSystemApp"
             sudo pkill Xvfb
             sudo rm -f /tmp/.X99-lock
           EOF
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/app_output.log application_logs.log || true
+          cat application_logs.log
