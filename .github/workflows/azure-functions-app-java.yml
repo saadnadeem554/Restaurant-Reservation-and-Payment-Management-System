@@ -54,7 +54,13 @@ jobs:
           curl -L -o dependencies/libs/slf4j-reload4j-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-reload4j/2.1.0-alpha1/slf4j-reload4j-2.1.0-alpha1.jar
           curl -L -o dependencies/libs/slf4j-simple-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.1.0-alpha1/slf4j-simple-2.1.0-alpha1.jar
           curl -L -o dependencies/libs/twilio-10.6.3.jar https://repo1.maven.org/maven2/com/twilio/sdk/twilio/10.6.3/twilio-10.6.3.jar
+      
+      - name: Organize Resources (FXML files)
+        run: |
+          mkdir -p resources/UI
+          cp ./UI/*.fxml resources/
 
+      
       - name: Build JavaFX app
         run: |
           export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
@@ -64,20 +70,10 @@ jobs:
           javac -cp "$JAVA_FX_PATH/*:dependencies/sqljdbc/sqljdbc_12.8/enu/jars/mssql-jdbc-12.8.1.jre11.jar:dependencies/libs/*" \
           -d out $(find . -name "*.java")
 
-          # Verify compilation
-          if [ ! -d "out" ]; then
-            echo "Compilation failed: No output directory found."
-            exit 1
-          fi
-
           # Create the JAR file
-          jar --create --file MyRestaurantApp.jar --main-class project.RestaurantSystemApp -C out .
+          jar --create --file MyRestaurantApp.jar --main-class project.RestaurantSystemApp -C out . -C resources .
 
-          # Verify JAR creation
-          if [ ! -f "MyRestaurantApp.jar" ]; then
-            echo "JAR creation failed: MyRestaurantApp.jar not found."
-            exit 1
-          fi
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -113,7 +109,7 @@ jobs:
   
           # Start the JavaFX application on the Azure VM
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
-            sudo apt install -y openjdk-21-jdk xvfb
+            sudo apt-get install xvfb
             nohup Xvfb :99 -screen 0 1920x1080x16 &
             export DISPLAY=:99
             nohup java \
