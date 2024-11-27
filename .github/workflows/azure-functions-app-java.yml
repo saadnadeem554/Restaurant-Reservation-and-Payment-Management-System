@@ -132,7 +132,7 @@ jobs:
             # Install Xvfb and ImageMagick if not already installed
             sudo apt-get update
             sudo apt-get install -y xvfb imagemagick
-      
+            sudo apt-get install -y x11-apps
             # Cleanup previous runs to ensure clean environment
             sudo pkill -f "java.*RestaurantSystemApp" || true
             sudo pkill Xvfb || true
@@ -159,11 +159,13 @@ jobs:
       
               # Capture multiple screenshots
               for i in {1..3}; do
-                import -display :99 -window root /home/azureuser/screenshots/screenshot_$i.png
+                xwd -root -out screenshot_$i.xwd -display :99
+                convert screenshot_$i.xwd screenshot_$i.png
                 sleep 1
               done
             )
-      
+            #move screenshots
+            mv screenshot_*.xwd screenshot_*.png /home/azureuser/screenshots/
             # Cleanup after execution
             sudo pkill -f "java.*RestaurantSystemApp"
             sudo pkill Xvfb
