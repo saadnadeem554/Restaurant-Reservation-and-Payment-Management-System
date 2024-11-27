@@ -78,10 +78,24 @@ jobs:
             echo "JAR creation failed: MyRestaurantApp.jar not found."
             exit 1
           fi
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-app-artifacts
+          path: |
+            MyRestaurantApp.jar
+            dependencies/libs
+            dependencies/sqljdbc
+            dependencies/javafx-sdk
   deploy:
     runs-on: ubuntu-latest
-    needs: build  # Ensure this job waits for 'build' job to finish
+    needs: build
     steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: my-app-artifacts
+
       - name: Copy files to Azure VM
         env:
           AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
@@ -92,9 +106,6 @@ jobs:
           echo "${AZURE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          # Copy the JAR and dependencies
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ./MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64 $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/sqljdbc_auth
-
-          # Start the app on the VM
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP "nohup java -Djava.library.path=/home/$AZURE_VM_USER/sqljdbc_auth -cp /path/to/javafx-sdk/lib/*:/home/$AZURE_VM_USER/MyRestaurantApp.jar dependencies/libs/* project.RestaurantSystemApp &"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP "nohup java -Djava.library.path=/home/$AZURE_VM_USER/sqljdbc_auth -cp /path/to/javafx-sdk/lib/*:dependencies/libs/*:/home/$AZURE_VM_USER/MyRestaurantApp.jar project.RestaurantSystemApp &"
