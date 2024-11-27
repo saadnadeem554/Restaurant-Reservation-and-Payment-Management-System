@@ -176,6 +176,7 @@ jobs:
             sudo rm -f /tmp/.X99-lock
       
             # Prepare directories
+            rm -r /home/azureuser/screenshots
             mkdir -p /home/azureuser/screenshots
             chmod 777 /home/azureuser/screenshots
       
