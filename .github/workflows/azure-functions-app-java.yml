@@ -53,10 +53,10 @@ jobs:
 
       - name: Organize Resources (FXML, CSS, and PNG files)
         run: |
-          mkdir -p resources/UI
-          cp ./UI/*.fxml resources/UI/
-          cp ./UI/*.css resources/UI/
-          cp ./UI/*.png resources/UI/
+          mkdir -p resources/
+          cp ./UI/*.fxml resources/
+          cp ./UI/*.css resources/
+          cp ./UI/*.png resources/
 
 
       - name: Build JavaFX app
