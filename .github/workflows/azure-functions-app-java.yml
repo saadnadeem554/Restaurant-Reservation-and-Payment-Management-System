@@ -19,8 +19,67 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      # ... (previous steps remain the same)
+      - name: Send SMS using Twilio
+        run: |
+          export TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }}
+          export TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }}
 
+      - name: Download JavaFX SDK and MSSQL driver
+        run: |
+          mkdir -p dependencies/javafx-sdk dependencies/sqljdbc
+          curl -L -o javafx-sdk.zip https://download2.gluonhq.com/openjfx/23.0.1/openjfx-23.0.1_linux-x64_bin-sdk.zip
+          unzip javafx-sdk.zip -d dependencies/javafx-sdk
+          curl -L -o sqljdbc.zip https://go.microsoft.com/fwlink/?linkid=2283744
+          unzip sqljdbc.zip -d dependencies/sqljdbc
+          rm -rf dependencies/sqljdbc/sqljdbc_*/enu/samples
+
+      - name: Download Additional Dependencies
+        run: |
+          mkdir -p dependencies/libs
+          # Download necessary dependencies
+          curl -L -o dependencies/libs/commons-logging-1.3.4.jar https://repo1.maven.org/maven2/commons-logging/commons-logging/1.3.4/commons-logging-1.3.4.jar
+          curl -L -o dependencies/libs/httpclient-4.5.14.jar https://repo1.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.14/httpclient-4.5.14.jar
+          curl -L -o dependencies/libs/httpcore-4.4.16.jar https://repo1.maven.org/maven2/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar
+          curl -L -o dependencies/libs/jackson-annotations-2.18.1.jar https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.18.1/jackson-annotations-2.18.1.jar
+          curl -L -o dependencies/libs/jackson-core-2.18.1.jar https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.18.1/jackson-core-2.18.1.jar
+          curl -L -o dependencies/libs/jackson-databind-2.18.1.jar https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.18.1/jackson-databind-2.18.1.jar
+          curl -L -o dependencies/libs/jackson-datatype-jsr310-2.18.1.jar https://repo1.maven.org/maven2/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.18.1/jackson-datatype-jsr310-2.18.1.jar
+          curl -L -o dependencies/libs/jcl-over-slf4j-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/jcl-over-slf4j/2.1.0-alpha1/jcl-over-slf4j-2.1.0-alpha1.jar
+          curl -L -o dependencies/libs/joda-time-2.13.0.jar https://repo1.maven.org/maven2/joda-time/joda-time/2.13.0/joda-time-2.13.0.jar
+          curl -L -o dependencies/libs/slf4j-api-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-api/2.1.0-alpha1/slf4j-api-2.1.0-alpha1.jar
+          curl -L -o dependencies/libs/slf4j-reload4j-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-reload4j/2.1.0-alpha1/slf4j-reload4j-2.1.0-alpha1.jar
+          curl -L -o dependencies/libs/slf4j-simple-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.1.0-alpha1/slf4j-simple-2.1.0-alpha1.jar
+          curl -L -o dependencies/libs/twilio-10.6.3.jar https://repo1.maven.org/maven2/com/twilio/sdk/twilio/10.6.3/twilio-10.6.3.jar
+
+      - name: Organize Resources (FXML, CSS, and PNG files)
+        run: |
+          mkdir -p resources/
+          cp ./UI/*.fxml resources/
+          cp ./UI/*.css resources/
+          cp ./UI/*.png resources/
+
+      - name: Build JavaFX app
+        run: |
+          export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
+          export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
+          
+          javac -cp "$JAVA_FX_PATH/*:dependencies/sqljdbc/sqljdbc_12.8/enu/jars/mssql-jdbc-12.8.1.jre11.jar:dependencies/libs/*" \
+          -d out $(find . -name "*.java")
+
+          jar --create --file MyRestaurantApp.jar --main-class project.RestaurantSystemApp \
+          -C out . -C resources .
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-app-artifacts
+          path: |
+            MyRestaurantApp.jar
+            dependencies/libs/**
+            dependencies/sqljdbc/**
+            dependencies/javafx-sdk/**
+            resources/**
+            
   deploy:
     runs-on: ubuntu-latest
     needs: build
