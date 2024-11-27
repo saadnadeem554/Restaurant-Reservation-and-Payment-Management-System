@@ -22,7 +22,7 @@ public class HomeController {
     public void show(Stage stage, ControlCallback callback) {
         try {
             // Load FXML file
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("HomeView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/HomeView.fxml"));
             Parent root = loader.load();
 
             // Get the controller instance
