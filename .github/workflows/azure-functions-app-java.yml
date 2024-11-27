@@ -108,16 +108,7 @@ jobs:
   
 
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
-            # Install Xvfb (if not already installed)
-            sudo apt-get update
-            sudo apt-get install -y xvfb
-  
-            # Start Xvfb in the background (virtual display)
-            nohup Xvfb :99 -screen 0 1920x1080x16 &
-  
-            # Export DISPLAY environment variable
-            export DISPLAY=:99
-  
+            
             # Run JavaFX application in headless mode
             nohup java \
               -Djava.library.path=/home/$AZURE_VM_USER/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64 \
