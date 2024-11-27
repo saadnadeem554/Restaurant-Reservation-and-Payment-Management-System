@@ -27,7 +27,7 @@ jobs:
           unzip javafx-sdk.zip -d dependencies/javafx-sdk
           # Download MSSQL driver
           rm -f sqljdbc.zip
-          curl -L -o sqljdbc.zip https://go.microsoft.com/fwlink/?linkid=2154486
+          curl -L -o sqljdbc.zip https://go.microsoft.com/fwlink/?linkid=2283744
           if ! unzip -tqq sqljdbc.zip; then
             echo "Downloaded SQLJDBC file is invalid."
             exit 1
