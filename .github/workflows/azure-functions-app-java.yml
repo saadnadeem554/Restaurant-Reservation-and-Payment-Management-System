@@ -110,7 +110,13 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r resources $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
-      
+
+      - name: run pre requisite commands
+        env:
+          AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
+          AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
+          AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+        run: |
           # Execute remote commands with explicit process management
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
             # Ensure clean environment
@@ -127,28 +133,33 @@ jobs:
             export XDG_RUNTIME_DIR=/tmp
             sudo Xvfb :99 -ac -screen 0 1280x1024x8 &
             sleep 2
-      
-            # Run application with timeout and logging
-            timeout 300s java \
-              -Dprism.order=sw \
-              -Djava.awt.headless=true \
-              -Djavafx.platform=desktop \
-              --module-path /home/$AZURE_VM_USER/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib \
-              --add-modules javafx.controls,javafx.fxml \
-              -cp /home/$AZURE_VM_USER/MyRestaurantApp.jar:/home/$AZURE_VM_USER/dependencies/libs/* \
-              project.RestaurantSystemApp > /home/$AZURE_VM_USER/app_output.log 2>&1 || true
-      
-            # Cleanup after execution
-            sudo pkill -f "java.*RestaurantSystemApp"
-            sudo pkill Xvfb
-            sudo rm -f /tmp/.X99-lock
           EOF
-
-      - name: Retrieve Application Logs
+      - name: Copy files to Azure VM and Execute
         env:
           AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
           AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
           AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
         run: |
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/app_output.log application_logs.log || true
-          cat application_logs.log
+          # Run application with timeout and logging
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
+            timeout 300s java \
+            -Dprism.order=sw \
+            -Djava.awt.headless=true \
+            -Djavafx.platform=desktop \
+            --module-path /home/$AZURE_VM_USER/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib \
+            --add-modules javafx.controls,javafx.fxml \
+            -cp /home/$AZURE_VM_USER/MyRestaurantApp.jar:/home/$AZURE_VM_USER/dependencies/libs/* \
+            project.RestaurantSystemApp
+          EOF
+      - name: Clean up
+        env:
+          AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
+          AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
+          AZURE_SSH_PRIVATE_KEY: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+        run: |
+          # Cleanup after execution
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
+            sudo pkill -f "java.*RestaurantSystemApp"
+            sudo pkill Xvfb
+            sudo rm -f /tmp/.X99-lock
+          EOF
