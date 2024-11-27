@@ -57,7 +57,7 @@ jobs:
           export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
           export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
           # Compile all Java files in the src directory
-          javac -cp "$JAVA_FX_PATH/*:dependencies/sqljdbc/sqljdbc_12.8/enu/mssql-jdbc.jar:dependencies/libs/*" \
+          javac -cp "$JAVA_FX_PATH/*:dependencies/sqljdbc/sqljdbc_12.8/enu/jars/mssql-jdbc-12.8.1.jre11.jar:dependencies/libs/*" \
           -d out $(find . -name "*.java")
           jar --create --file MyRestaurantApp.jar --main-class project.RestaurantSystemApp -C out .
 
