@@ -137,7 +137,7 @@ public class AdminController {
             if (isPasswordCorrect(password)) {
                 // If the password is correct, load the admin interface
                 try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("AdminView.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/AdminView.fxml"));
 
                     // Set a custom controller factory
                     loader.setControllerFactory(param -> new AdminController());
