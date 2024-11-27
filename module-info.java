@@ -4,8 +4,6 @@ module Proj {
 	requires javafx.graphics;
 	requires javafx.fxml;
 	requires java.security.jgss;
-	requires jdk.security.auth;
-	requires static java.sql;
 
 
 	opens project to javafx.graphics, javafx.fxml, javafx.base;
