@@ -1,0 +1,36 @@
+name: Build and Deploy to Fly.io
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build JavaFX application
+        run: |
+          javac -cp ".:mssql-jdbc.jar" Main.java
+          jar cvfe MyRestaurantApp.jar Main -C . .
+
+      - name: Install Flyctl
+        run: curl -L https://fly.io/install.sh | sh
+
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          APP_NAME: ${{ secrets.APP_NAME }}
+          REGION: ${{ secrets.REGION }}
+        run: |
+          flyctl deploy --app $APP_NAME --region $REGION
