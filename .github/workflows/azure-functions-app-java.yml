@@ -19,10 +19,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Download JavaFX SDK and MSSQL driver
+        run: |
+          mkdir -p dependencies/javafx-sdk dependencies/sqljdbc
+          curl -L -o javafx-sdk.zip https://download2.gluonhq.com/openjfx/23.0.1/openjfx-23.0.1_linux-x64_bin-sdk.zip
+          unzip javafx-sdk.zip -d dependencies/javafx-sdk
+          curl -L -o sqljdbc.zip https://go.microsoft.com/fwlink/?linkid=2154486
+          unzip sqljdbc.zip -d dependencies/sqljdbc
+
       - name: Build JavaFX app
         run: |
-          javac -cp ".:mssql-jdbc.jar" Main.java
-          jar cvfe MyRestaurantApp.jar Main -C . .
+          export JAVA_FX_PATH=$(pwd)/dependencies/javafx-sdk/javafx-sdk-23.0.1/lib
+          export SQLJDBC_AUTH_PATH=$(pwd)/dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64
+          javac --module-path "$JAVA_FX_PATH" --add-modules javafx.controls,javafx.fxml -cp ".:dependencies/sqljdbc/sqljdbc_12.8/enu/mssql-jdbc.jar" src/Main.java
+          jar cvfe MyRestaurantApp.jar Main -C src .
 
   deploy:
     runs-on: ubuntu-latest
@@ -37,4 +47,5 @@ jobs:
           echo "${AZURE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa MyRestaurantApp.jar $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP "nohup java -jar /home/$AZURE_VM_USER/MyRestaurantApp.jar &"
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies/sqljdbc/sqljdbc_12.8/enu/auth/x64 $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/sqljdbc_auth
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP "nohup java -Djava.library.path=/home/$AZURE_VM_USER/sqljdbc_auth --module-path /path/to/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml -jar /home/$AZURE_VM_USER/MyRestaurantApp.jar &"
