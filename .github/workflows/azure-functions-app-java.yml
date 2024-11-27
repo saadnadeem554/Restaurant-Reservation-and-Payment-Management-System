@@ -160,7 +160,15 @@ jobs:
           # Execute remote commands with detailed logging
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
             set -x  # Enable command tracing for debugging
-            
+            sudo apt-get install libosmesa6
+            export LIBGL_ALWAYS_SOFTWARE=1
+            glxinfo | grep OpenGL
+            sudo apt-get install libosmesa6
+            export LIBGL_ALWAYS_SOFTWARE=1
+            glxinfo | grep OpenGL
+            sudo apt-get install xserver-xorg-video-dummy
+            sudo apt-get install xvfb
+            sudo apt-get install mesa-utils libgl1-mesa-glx libgl1-mesa-dri
 
             # Cleanup previous processes
             sudo pkill -f "java.*RestaurantSystemApp" || true
@@ -173,7 +181,7 @@ jobs:
       
             # Start Xvfb
             
-            Xvfb :99 -ac -screen 0 1280x1024x8 &> /home/azureuser/xvfb.log &
+            Xvfb :99 -ac -screen 0 1280x1024x24 +extension GLX +render &> /home/azureuser/xvfb.log &
             XVFB_PID=$!
             sleep 5  # Allow Xvfb to initialize
             DISPLAY=:99 glxinfo | grep "OpenGL"
