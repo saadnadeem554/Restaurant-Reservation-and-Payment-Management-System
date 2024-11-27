@@ -26,13 +26,11 @@ jobs:
           curl -L -o javafx-sdk.zip https://download2.gluonhq.com/openjfx/23.0.1/openjfx-23.0.1_linux-x64_bin-sdk.zip
           unzip javafx-sdk.zip -d dependencies/javafx-sdk
           # Download MSSQL driver
-          rm -f sqljdbc.zip
           curl -L -o sqljdbc.zip https://go.microsoft.com/fwlink/?linkid=2283744
-          if ! unzip -tqq sqljdbc.zip; then
-            echo "Downloaded SQLJDBC file is invalid."
-            exit 1
-          fi
           unzip sqljdbc.zip -d dependencies/sqljdbc
+          # Remove samples folder
+          rm -rf dependencies/sqljdbc/sqljdbc_*/enu/samples
+
 
       - name: Download Additional Dependencies
         run: |
