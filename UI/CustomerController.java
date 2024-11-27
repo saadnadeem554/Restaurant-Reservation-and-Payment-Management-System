@@ -219,7 +219,7 @@ public class CustomerController {
         // Use FXML or scene switching to load the customer interface
         // Example assuming CustomerHomeView is an FXML file
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("CustomerHomeView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/CustomerHomeView.fxml"));
             
             loader.setControllerFactory(param -> new CustomerController());
             Parent root = loader.load();
