@@ -126,6 +126,7 @@ jobs:
             
             # Start Xvfb with a known configuration
             sudo Xvfb :99 -ac -screen 0 1280x1024x8 -nolisten tcp -noreset &
+            echo -e "\n" > /dev/tty
           EOF
       - name: Deploy the programm
         env:
