@@ -103,8 +103,6 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r dependencies $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r resources $AZURE_VM_USER@$AZURE_VM_IP:/home/$AZURE_VM_USER/
 
-      - name: Set up Xvfb on Azure VM
-        run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
             sudo apt-get update
             sudo apt-get install -y xvfb
@@ -112,8 +110,6 @@ jobs:
             export DISPLAY=:99
           EOF
 
-      - name: Start JavaFX Application on Azure VM
-        run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << EOF
             export DISPLAY=:99
             nohup java \
