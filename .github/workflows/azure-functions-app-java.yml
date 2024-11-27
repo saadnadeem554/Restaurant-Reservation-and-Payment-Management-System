@@ -126,7 +126,11 @@ jobs:
             which import
             
             # Install additional debugging tools
-            sudo apt install -y x11-apps mesa-utils
+            sudo apt install -y x11-apps mesa-utils x11-utils
+            sudo apt install -y scrot
+            sudo apt install -y libgl1-mesa-glx libglx-mesa0
+            DISPLAY=:99 glxinfo | grep "OpenGL"
+
             
             # Upgrade packages
             sudo apt upgrade -y
@@ -157,6 +161,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $AZURE_VM_USER@$AZURE_VM_IP << 'EOF'
             set -x  # Enable command tracing for debugging
             
+
             # Cleanup previous processes
             sudo pkill -f "java.*RestaurantSystemApp" || true
             sudo pkill Xvfb || true
