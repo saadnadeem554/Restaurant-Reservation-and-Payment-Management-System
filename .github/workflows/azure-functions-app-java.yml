@@ -114,9 +114,6 @@ jobs:
             sudo rm -f /tmp/.X99-lock
             sudo pkill -f "java.*RestaurantSystemApp" || true
             sudo pkill Xvfb || true
-
-            sudo Xvfb :99 -ac -screen 0 1280x1024x8 &
-            sleep 2
             # Ensure clean X11 environment
             export DISPLAY=:99
             export XDG_RUNTIME_DIR=/tmp
