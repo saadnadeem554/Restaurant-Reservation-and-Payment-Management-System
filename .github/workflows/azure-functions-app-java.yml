@@ -51,10 +51,13 @@ jobs:
           curl -L -o dependencies/libs/slf4j-simple-2.1.0-alpha1.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.1.0-alpha1/slf4j-simple-2.1.0-alpha1.jar
           curl -L -o dependencies/libs/twilio-10.6.3.jar https://repo1.maven.org/maven2/com/twilio/sdk/twilio/10.6.3/twilio-10.6.3.jar
 
-      - name: Organize Resources (FXML files)
+      - name: Organize Resources (FXML, CSS, and PNG files)
         run: |
           mkdir -p resources/UI
-          cp ./UI/*.fxml resources/
+          cp ./UI/*.fxml resources/UI/
+          cp ./UI/*.css resources/UI/
+          cp ./UI/*.png resources/UI/
+
 
       - name: Build JavaFX app
         run: |
